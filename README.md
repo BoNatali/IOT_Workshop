@@ -13,8 +13,8 @@ On this git repository you will find:
   4. The workshop description and setup
 
 ## Authors ##
-This workshop is created by minor Internet of Things students of the faculty of Digital Media and Creative Industries, part of the Amsterdam University of Applied Sciences.
-For questions regarding the workshop you can contact Bas Pijls, b.pijls[AT]hva.nl or Joey van der Bie, j.h.f.van.der.bie[AT]hva.nl
+This workshop is created by minor Internet of Things students of the HBO-ICT programme of the faculty of Digital Media and Creative Industries, part of the Amsterdam University of Applied Sciences. You can find out more about the program at http://www.hva.nl/hbo-ict 
+For questions regarding the workshop you can contact teacher Bas Pijls, b.pijls[AT]hva.nl or researcher/teacher Joey van der Bie, j.h.f.van.der.bie[AT]hva.nl
 
 ## License ##
 This content is released under the ... license.
