@@ -1,13 +1,20 @@
 <?php
   require_once('check.php');
+
+  $query = DatabaseQuery::getAll();
+
   if(!isset($_GET['td'])) {
       echo 'Target device id not found!';
       exit;
   }
-  $stmt = $pdo->prepare("SELECT message FROM device_configuration WHERE device_id = ? AND target_device_id = ?");
+  
+  $stmt = Database::getInstance()->prepare($query['read_device_configuration_message']);
   if(!$stmt->execute([$_GET['td'], $_GET['d']])) {
     echo 'Something has gone wrong!';
     exit;
+  } 
+  if($stmt->rowCount() == 1) {
+      $row = $stmt->fetch();
   }
 ?>
 <!doctype html>
@@ -18,13 +25,10 @@
 <div class="middle-container">
   <div>
     <h1 class="text-center">Sinterklaas</h1>
-    <h2 class="text-center">message of <?php echo $_GET['td']; ?></h2>
+    <h2 class="text-center">Message of <?php echo $_GET['td']; ?></h2>
     <div class="vertical-gap-30 text-container">
     <?php
-    if($stmt->rowCount() == 1) {
-      $row = $stmt->fetch();
       echo $row['message'];
-    }
     ?>
     </div>
     <form action="dashboard.php#filter">

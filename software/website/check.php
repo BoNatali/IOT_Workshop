@@ -1,17 +1,23 @@
 <?php
+/*
+ * Check if device id is provided and exists, else redirect to homepage
+*/
+
 require_once('config.php');
 require_once('util.php');
 require_once('database.php');
+require_once('query.php');
 
-# Checks if device is valid
+// Check if device is set
 if(!isset($_GET['d'])) {
   redirect(ROOT);
 } else {
-  $stmt = $pdo->prepare("SELECT * FROM device WHERE id = ?");
+  // Check if device exists, if not redirect to homepage location
+  $query = DatabaseQuery::getAll();
+  $stmt = Database::getInstance()->prepare($query['read_device']);
   if ($stmt->execute([$_GET['d']])) {
     if($stmt->rowCount() == 0) {
-      header('Location: ' . ROOT);
-      die();
+      redirect(ROOT);
     }
   }
 }

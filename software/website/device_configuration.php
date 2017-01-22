@@ -1,15 +1,26 @@
 <?php
+  /*
+  * On this page you can create/update a device configuration between two devices
+  */
   require_once('check.php');
+
+  $query = DatabaseQuery::getAll();
+
+  // Default values (for creation)
   $spring = 50;
   $damp = 50;
   $color = 180;
   $message = '';
   $target_device_id = '';
-  if(isset($_GET['d']) && isset($_GET['td'])) {
-    $stmt = $pdo->prepare("SELECT * FROM device_configuration WHERE device_id = ? AND target_device_id = ?");
+  
+  // Read device configuration from database if relation between device and target device already exists (for updating)
+  if(isset($_GET['td'])) {
+    $stmt = Database::getInstance()->prepare($query['read_device_configuration']);
     if ($stmt->execute([$_GET['d'], $_GET['td']])) {
       if($stmt->rowCount() > 0) {
         $data = $stmt->fetch();
+
+        // Convert some values back to usable values for in the interface
         $target_device_id = $data['target_device_id'];
         $color = round(360 * hex2hsl($data['color'])[0]);
         $spring = round((100 / 255) * $data['spring']);
@@ -19,7 +30,7 @@
     }
   }
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <title>Device Configuration - IoT Workshop</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="main.css">
@@ -94,11 +105,13 @@
     });
   }
 
+  // Change the value of the color picker
   function changeColorPickerValue(value) {
     var colorPickerValue = document.getElementById("colorPickerValue");
     colorPickerValue.style.backgroundColor = "hsl(" + value + ", 100%, 50%)"
   }
 
+  // Change text of an element
   function changeText(element, value) {
     element.innerHTML = value;
   }

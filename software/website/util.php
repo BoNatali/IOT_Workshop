@@ -1,8 +1,12 @@
 <?php
+  /*
+  * Utilities used within the project
+  */
   require_once('color_converter.php');
+
   function redirect($location) {
     header('Location: ' . $location);
-    die();
+    exit;
   }
 
   function randomColor() {

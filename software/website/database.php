@@ -1,21 +1,30 @@
 <?php
+require_once('config.php');
 
-# Edit this to your needs
-$servername = 'localhost';
-$username = 'root';
-$password = '';
-$db = 'internet_of_things_workshop';
+class Database {
 
-try {
-  $pdo = new PDO(
-      'mysql:host=' . $servername . ';dbname=' . $db,
-      $username,
-      $password
-    );
-} catch(PDOException $e) {
-  die($e->getMessage());
+  private static $instance;
+
+  private function __construct() {
+    if(!isset($instance)) {
+      try {
+        self::$instance = new PDO(
+          'mysql:host=' . DB_SERVERNAME . ';dbname=' . DB_SCHEMA,
+          DB_USERNAME,
+          DB_PASSWORD
+        );
+      } catch(PDOException $e) {
+        die($e->getMessage());
+      }
+    }
+  }
+  public static function getInstance() {
+    if(!self::$instance) {
+      new Database();
+    }
+    return self::$instance;
+  }
 }
 
-return $pdo;
 
 ?>

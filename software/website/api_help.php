@@ -1,5 +1,6 @@
 <!doctype html>
-<title>API Help</title>
+<title>Public API Help</title>
+<h1>Parameters</h1>
 <p>You can use the following parameters in a querystring:</p>
 <table>
   <thead>
@@ -26,15 +27,36 @@
     <tr>
       <td>c</td>
       <td>string</td>
-      <td>Hex color</td>
+      <td>Color, hex is default, change cv if you want to use another value</td>
+    </tr>
+    <tr>
+      <td>cv</td>
+      <td>string</td>
+      <td>Color value type (hex or hue)</td>
+    </tr>
+    <tr>
+      <td>sc</td>
+      <td>int</td>
+      <td>Spring constant</td>
+    </tr>
+    <tr>
+      <td>dc</td>
+      <td>int</td>
+      <td>Damp constant</td>
+    </tr>
+    <tr>
+      <td>m</td>
+      <td>string</td>
+      <td>Message, can be anything</td>
     </tr>
     <tr>
       <td>v</td>
       <td>int</td>
-      <td>Version</td>
+      <td>Version, should be two if you have the latest firmware</td>
     </tr>
   </tbody>
 </table>
+<h1>Actions</h1>
 <p>Type of actions (t):</p>
 <table>
   <thead>
@@ -47,7 +69,7 @@
     <tr>
       <td>sdc</td>
       <td>Set device configuration</td>
-      <td>d*, td*, c*</td>
+      <td>d*, td*, c*, cv, sc, dc, m</td>
       <td>1 or -1</td>
     </tr>
     <tr>
@@ -73,7 +95,7 @@
     * is required
   </tfoot>
 </table>
-<p><b>Examples:</b></p>
+<h1>Examples</h1>
 <table>
   <tr>
     <td>api.php?t=sdc&d=T111&td=T222&c=ff0000</td>
