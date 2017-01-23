@@ -16,6 +16,7 @@ class APITest extends TestCase
     {
         createDevice('t111');
         setDeviceConfiguration('t111', 't111', '666');
+        blacklistDeviceConfiguration('t111', 't111', 0);
         setQueueItem('t111');
     }
 
@@ -25,6 +26,66 @@ class APITest extends TestCase
      */
     public function testCreateDeviceFailsWithoutDeviceId() {
         $this->assertEquals(-1, createDevice(null));
+    }
+    /*
+     * Create Device Fails With Invalid Device Id
+     * @covers ::createDevice
+     */
+    public function testCreateDeviceFailsWithInvalidDeviceId() {
+        $this->assertEquals(-1, createDevice('t1111'));
+    }
+    /*
+     * Create Device Success With Valid Device Id
+     * @covers ::createDevice
+     */
+    public function testCreateDeviceSuccessWithValidDeviceId() {
+        $test_device_id = 't123';
+
+        $this->assertNotFalse(DatabaseQuery::createDevice($test_device_id));
+
+        DatabaseQuery::prepareAndExecute('DELETE FROM device WHERE id = ?', [$test_device_id]);
+    }
+    /**
+    * Blacklist Device Configuration Fails Without Device Id
+    * @covers ::blacklistDeviceConfiguration
+    */
+    public function testBlacklistDeviceConfigurationFailsWithoutDeviceId() {
+        $this->assertEquals(-1, blacklistDeviceConfiguration(null, 't111', 1));
+    }
+    /**
+    * Blacklist Device Configuration Fails Without Valid Device Id
+    * @covers ::blacklistDeviceConfiguration
+    */
+    public function testBlacklistDeviceConfigurationFailsWithoutValidDeviceId() {
+        $this->assertEquals(-1, blacklistDeviceConfiguration('t1111', 't111', 1));
+    }
+    /**
+    * Blacklist Device Configuration Fails Without Target Device Id
+    * @covers ::blacklistDeviceConfiguration
+    */
+    public function testBlacklistDeviceConfigurationFailsWithoutTargetDeviceId() {
+        $this->assertEquals(-1, blacklistDeviceConfiguration('t111', null, 1));
+    }
+    /**
+    * Blacklist Device Configuration Fails Without Valid Target Device Id
+    * @covers ::blacklistDeviceConfiguration
+    */
+    public function testBlacklistDeviceConfigurationFailsWithoutValidTargetDeviceId() {
+        $this->assertEquals(-1, blacklistDeviceConfiguration('t111', 't1111', 1));
+    }
+    /**
+    * Blacklist Device Configuration Fails Without Blacklist
+    * @covers ::blacklistDeviceConfiguration
+    */
+    public function testBlacklistDeviceConfigurationFailsWithoutBlacklist() {
+        $this->assertEquals(-1, blacklistDeviceConfiguration('t111', 't111', null));
+    }
+    /**
+    * Blacklist Device Configuration Success Without Valid Blacklist
+    * @covers ::blacklistDeviceConfiguration
+    */
+    public function testBlacklistDeviceConfigurationSuccessWithoutValidBlacklist() {
+        $this->assertEquals(1, blacklistDeviceConfiguration('t111', 't111', '123'));
     }
     /* 
      * Set Device Configuration Fails Without Device Id
@@ -122,6 +183,7 @@ class APITest extends TestCase
     {
         // Delay of 1 second because timestamp is part of primary key
         sleep(1);
+
         $this->assertEquals(1, setQueueItem('t111'));
     }
     /* 

@@ -4,8 +4,6 @@ require_once('util.php');
 require_once('database.php');
 require_once('query.php');
 
-$query = DatabaseQuery::getAll();
-
 // All possible parameters
 $p = [
 't' => null, // Type
@@ -95,11 +93,11 @@ if(isset($p['r'])) {
 */
 function blacklistDeviceConfiguration($device_id, $target_device_id, $blacklist) {
     if(isset($device_id) && isset($target_device_id) && isset($blacklist)) {
-      $query = DatabaseQuery::getAll();
         // Prepare update device configuration and execute
-        $stmt = Database::getInstance()->prepare($query['update_device_configuration_blacklist']);
-        if ($stmt->execute([$blacklist, $target_device_id, $device_id])) {
-            return 1;
+        if ($stmt = DatabaseQuery::updateDeviceConfigurationWithBlacklist($blacklist, $device_id, $target_device_id)) {
+            if($stmt->rowCount() == 1) {
+                return 1;
+            } 
         }
     }
     return -1;
@@ -141,12 +139,8 @@ function setDeviceConfiguration($device_id, $target_device_id, $color, $color_ty
             $message = $message;
         }
         
-        $query = DatabaseQuery::getAll();
-        $db = Database::getInstance();
-        
         // Check if device configuration exists between device id and target device id, if yes, update it
-        $stmt = $db->prepare($query['read_device_configuration']);
-        if ($stmt->execute([$device_id, $target_device_id])) {
+        if ($stmt = DatabaseQuery::readDeviceConfiguration($device_id, $target_device_id)) {
             if($stmt->rowCount() > 0) {
                 // Determine which fields to update
                 $data = $stmt->fetch();
@@ -157,15 +151,15 @@ function setDeviceConfiguration($device_id, $target_device_id, $color, $color_ty
                 $message = isset($message) ? $message : $data['message'];
                 
                 // Prepare update statement
-                $stmt = $db->prepare($query['update_device_configuration']);
+                if(DatabaseQuery::updateDeviceConfiguration($hexcolor, $spring_constant, $damp_constant, $message, $device_id, $target_device_id)) {
+                    return 1;
+                }
             } else {
                 // Prepare create statement
-                $stmt = $db->prepare($query['create_device_configuration']);
+                if(DatabaseQuery::createDeviceConfiguration($hexcolor, $spring_constant, $damp_constant, $message, $device_id, $target_device_id)) {
+                    return 1;
+                }
             }
-        }
-        // Execute update/create statement
-        if ($stmt->execute([$hexcolor, $spring_constant, $damp_constant, $message, $device_id, $target_device_id])) {
-            return 1;
         }
     }
     return -1;
@@ -179,19 +173,13 @@ function setDeviceConfiguration($device_id, $target_device_id, $color, $color_ty
 */
 function removeDeviceConfiguration($device_id, $target_device_id) {
     if(isset($device_id) && isset($target_device_id)) {
-        $query = DatabaseQuery::getAll();
-        $db = Database::getInstance();
-        
         // Check if exists
-        $stmt = $db->prepare($query['read_device_configuration']);
-        if ($stmt->execute([$device_id, $target_device_id])) {
+        if ($stmt = DatabaseQuery::readDeviceConfiguration($device_id, $target_device_id)) {
             if($stmt->rowCount() > 0) {
                 // Remove all queue items of device and target device
-                $stmt = $db->prepare($query['delete_queue_items']);
-                if ($stmt->execute([$device_id, $target_device_id])) {
+                if (DatabaseQuery::deleteQueueItems($device_id, $target_device_id)) {
                     // Remove device configuration
-                    $stmt = $db->prepare($query['delete_device_configuration']);
-                    if ($stmt->execute([$device_id, $target_device_id])) {
+                    if (DatabaseQuery::deleteDeviceConfiguration($device_id, $target_device_id)) {
                         return 1;
                     }
                 }
@@ -210,21 +198,18 @@ function removeDeviceConfiguration($device_id, $target_device_id) {
 function getQueueItem($device_id, $version = null) {
     $response = -1;
     if(isset($device_id)) {
-        $query = DatabaseQuery::getAll();
-        $stmt = Database::getInstance()->prepare($query['read_queue_item']);
-        if($stmt->execute([$device_id, $device_id])) {
+        if($stmt = DatabaseQuery::readQueueItem($device_id, $device_id)) {
             if ($stmt->rowCount() == 1) {
                 $dc = $stmt->fetch();
                 
                 // Delete from queue because it's not needed anymore, delete all from queue when temp
                 if($dc['temp'] != 1) {
-                  $q = $query['delete_queue_item_target_device_id_limit'];
+                    $stmt = DatabaseQuery::deleteQueueItemWithTargetDeviceIdAndLimit($device_id);
                 } else {
-                  $q = $query['delete_queue_item_target_device_id'];
+                    $stmt = DatabaseQuery::deleteQueueItemWithTargetDeviceId($device_id);
                 }
 
-                $stmt = Database::getInstance()->prepare($q);
-                if ($stmt->execute([$device_id])) {
+                if ($stmt) {
                     // Return queue item
                     // We need this check because workshop 1 hardware isn't compatible with a response of more than the color
                     if(isset($version) && $version == '2') {
@@ -235,18 +220,15 @@ function getQueueItem($device_id, $version = null) {
                     
                     // A temp device configuration has to be deleted after one queue item has been taken
                     if($dc['temp'] == 1) {
-                        $stmt1 = Database::getInstance()->prepare($query['delete_queue_item']);
-                        if(!$stmt1->execute([$device_id])) {
+                        if(!DatabaseQuery::deleteQueueItem($device_id)) {
                             
                         }
                         
                         // OR doesnt work for some reason
-                        $stmt1 = Database::getInstance()->prepare($query['delete_device_configuration_where_target_device_id_and_temp']);
-                        if(!$stmt1->execute([$device_id, 1])) {
+                        if(!DatabaseQuery::deleteDeviceConfigurationWithTargetDeviceIdAndTemp($device_id, 1)) {
                             
                         }
-                        $stmt1 = Database::getInstance()->prepare($query['delete_device_configuration_where_device_id_and_temp']);
-                        if(!$stmt1->execute([$device_id, 1])) {
+                        if(!DatabaseQuery::deleteDeviceConfigurationWithDeviceIdAndTemp($device_id, 1)) {
                             
                         }
                     }
@@ -259,14 +241,12 @@ function getQueueItem($device_id, $version = null) {
 
 /**
 * Create a device by providing an id (most of the times 4 chars long)
-* @param string $device_id Id of the device
+* @param string $device_id Id of the device (max length: 4)
 * @return int
 */
 function createDevice($device_id) {
     if(isset($device_id)) {
-        $query = DatabaseQuery::getAll();
-        $stmt = Database::getInstance()->prepare($query['create_device']);
-        if($stmt->execute([$device_id])) {
+        if(DatabaseQuery::createDevice($device_id)) {
             return 1;
         }
     }
@@ -280,16 +260,12 @@ function createDevice($device_id) {
 function setQueueItem($device_id) {
     $response = -1;
     if(isset($device_id)) {
-        $query = DatabaseQuery::getAll();
-        $db = Database::getInstance();
         // Insert queue items based on howmany device configurations (links between devices) there are
-        $stmt =  $db->prepare($query['list_device_configuration']);
-        if($stmt->execute([$device_id])) {
+        if($stmt = DatabaseQuery::listDeviceConfiguration($device_id)) {
             $data = $stmt->fetchAll();
             // Create one item in the queue for each link
             foreach($data as $row) {
-                $stmt = $db->prepare($query['create_queue_item']);
-                if ($stmt->execute([$device_id, $row['target_device_id']])) {
+                if (DatabaseQuery::createQueueItem($device_id, $row['target_device_id'])) {
                     $response = 1;
                 }
                 
@@ -306,27 +282,23 @@ function setQueueItem($device_id) {
 * @return int
 */
 function massAssign() {
-    $stmt1 = $pdo->prepare($query['list_device']);
-    if($stmt1->execute()) {
+    if($stmt1 = DatabaseQuery::listDevice()) {
         $devices = $stmt1->fetchAll();
         for($i = 0; $i < count($devices); $i++) {
             for($x = 0; $x < count($devices); $x++) {
                 if($devices[$i] != $devices[$x]) {
                     // Check if device configuration exists
-                    $stmt2 = $pdo->prepare($query['read_device_configuration']);
-                    if($stmt2->execute([$devices[$i]['id'], $devices[$x]['id']])) {
+                    if($stmt2 = DatabaseQuery::readDeviceConfiguration($devices[$i]['id'], $devices[$x]['id'])) {
                         // Insert if it doesn't exist
                         if($stmt2->rowCount() == 0) {
-                            $stmt2 = $pdo->prepare($query['create_device_configuration_with_temp']);
                             // TODO: color has to be random
-                            if($stmt2->execute([$devices[$i]['id'], $devices[$x]['id'], randomColor(), 127, 127, 1])) {
+                            if(DatabaseQuery::createDeviceConfigurationWithTemp($devices[$i]['id'], $devices[$x]['id'], randomColor(), 127, 127, 1)) {
                                 $response = 1;
                             }
                         }
                         // Insert in queue
-                        $stmt3 = $pdo->prepare($query['create_queue_item']);
                         // TODO: color has to be random
-                        if($stmt3->execute([$devices[$i]['id'], $devices[$x]['id']])) {
+                        if(DataaseQuery::createQueueItem($devices[$i]['id'], $devices[$x]['id'])) {
                             $response = 1;
                         }
                     }

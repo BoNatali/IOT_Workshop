@@ -13,9 +13,7 @@ if(!isset($_GET['d'])) {
   redirect(ROOT);
 } else {
   // Check if device exists, if not redirect to homepage location
-  $query = DatabaseQuery::getAll();
-  $stmt = Database::getInstance()->prepare($query['read_device']);
-  if ($stmt->execute([$_GET['d']])) {
+  if ($stmt = DatabaseQuery::readDevice($_GET['d'])) {
     if($stmt->rowCount() == 0) {
       redirect(ROOT);
     }

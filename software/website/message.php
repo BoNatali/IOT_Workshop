@@ -1,15 +1,12 @@
 <?php
   require_once('check.php');
 
-  $query = DatabaseQuery::getAll();
-
   if(!isset($_GET['td'])) {
       echo 'Target device id not found!';
       exit;
   }
   
-  $stmt = Database::getInstance()->prepare($query['read_device_configuration_message']);
-  if(!$stmt->execute([$_GET['td'], $_GET['d']])) {
+  if(!$stmt = DatabaseQuery::readDeviceConfigurationWithMessage($_GET['td'], $_GET['d'])) {
     echo 'Something has gone wrong!';
     exit;
   } 

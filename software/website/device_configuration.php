@@ -4,8 +4,6 @@
   */
   require_once('check.php');
 
-  $query = DatabaseQuery::getAll();
-
   // Default values (for creation)
   $spring = 50;
   $damp = 50;
@@ -15,8 +13,7 @@
   
   // Read device configuration from database if relation between device and target device already exists (for updating)
   if(isset($_GET['td'])) {
-    $stmt = Database::getInstance()->prepare($query['read_device_configuration']);
-    if ($stmt->execute([$_GET['d'], $_GET['td']])) {
+    if ($stmt = DatabaseQuery::readDeviceConfiguration($_GET['d'], $_GET['td'])) {
       if($stmt->rowCount() > 0) {
         $data = $stmt->fetch();
 

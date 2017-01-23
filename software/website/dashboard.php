@@ -4,20 +4,15 @@
   */
   require_once('check.php');
 
-  $query = DatabaseQuery::getAll();
-  $db = Database::getInstance();
-
   // Retrieve outgoing connections
-  $outgoing_stmt = $db->prepare($query['list_device_configuration_not_temp']);
-  if(!$outgoing_stmt->execute([$_GET['d']])) {
+  if(!$outgoing_stmt = DatabaseQuery::listDeviceConfigurationNotTemp($_GET['d'])) {
     echo 'Something has gone wrong!';
     exit;
   }
   $outgoing_count = $outgoing_stmt->rowCount();
 
   // When reading incoming connections the device id of the logged in user is the target device id
-  $incoming_stmt = $db->prepare($query['list_device_configuration_where_target_device_id_and_not_temp']);
-  if(!$incoming_stmt->execute([$_GET['d']])) {
+  if(!$incoming_stmt = DatabaseQuery::listDeviceConfigurationWithTargetDeviceIdAndNotTemp($_GET['d'])) {
     echo 'Something has gone wrong!';
     exit;
   }
