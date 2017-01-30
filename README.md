@@ -18,5 +18,5 @@ For questions regarding the workshop you can contact teacher Bas Pijls, b.pijls[
 This Project was made by, Michelle Rotter(design), Axel Kiebooms(Arduino/Emotion expansion), Nick Leijenhorst(Arnuino/Design), Wilco Wijdenes(Website/Database) and Arnout Schekkerman(Arduino/Boxbot expansion)
 
 ## License ##
-This content is released under the ... license.
+This content is released under the "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007" license.
 
