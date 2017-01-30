@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link href="css/styleBoxBot.css" rel="stylesheet" type="text/css"/>
+        <script src="js/boxControl.js" type="text/javascript"></script> 
+        <title>Boxbot - Code</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                padding-top: 70px;
+                /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="index.html">BoxBot</a>
+                </div>
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a href="chain.html">Chain-Modus</a>
+                        </li>
+                        <li>
+                            <a href="code.html">Code-Modus</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container -->
+        </nav>
+
+        <!-- Page Content -->
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h1>Welkom in code-modus</h1>
+                </div>
+            </div>
+            <!-- /.row -->
+
+            <div class="col-lg-6"><!-- left side-->
+                <div class="col-lg-12">
+                    <textarea rows="4" cols="50" class="codeArea" id="codeArea"> </textarea>
+                    <button id="goButton" class="btn btn-success controllerButton" onclick="goCode();">
+                        <span id="goButtonGlyphicon" class="glyphicon glyphicon-play-circle"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-lg-6"><!-- right side-->
+                <p> Hier kan je de BoxBot besturen doormiddel van code<br>
+                    de code is simpel, je hebt forward, left en right, dit zijn de bewegingen.<br>
+                    Je moet ook aangeven hoelang en hoe snel de beweging moet zijn.<br>
+                    De tijd is in miliseconde(1000 miliseconde is één seconde).<br>
+                    De snelheid is maximaal 255 en minimaal 1;
+                    Je commando's zien er dus zo uit als het voorbeeld hieronder.
+                </p>
+                <pre><i>richting</i>;<i>snelheid</i>;<i>tijd</i>;</pre>
+                <p>
+                    Na elk woord doe je een puntcomma, dat is het volgende teken <kbd>;</kbd>.
+                    een voorbeeld is dus naar links naar voren en dan naar rechts, dat ziet er zo uit:
+                </p>
+                <pre>forward;100;200;left;200;200;right;212;233;</pre>
+                <p>
+                    De maximum snelheid is 255 en de maximum tijd is zo lang als je wilt. <br>
+                    Wanneer je de BoxBot wilt laten rijden druk je op de groene knop en wordt de knop rood.<br>
+                    Als je de BoxBot wilt stoppen druk je rode knop.<br>
+                </p>
+            </div>
+        </div> <!-- container -->
+
+        <!-- jQuery Version 1.11.1 -->
+        <script src="js/jquery.js"></script>
+
+        <!-- Bootstrap Core JavaScript -->
+        <script src="js/bootstrap.min.js"></script>
+
+    </body>
+
+</html>
