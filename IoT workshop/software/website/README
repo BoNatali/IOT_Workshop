@@ -1,1 +1,36 @@
 This dir should be placed on the server 
+
+img folder: icons used within the project
+
+tests folder: unit tests for testing the database queries and api.
+
+api.php: very minimal API for the website
+
+api_help.php: help about the api
+
+check.php: check if the device id is valid and if not redirect
+
+color_converter: library for converting various color codes
+
+config.php: settings for the database and website
+
+dashboard.php: overview of the box (link to create a new connection, edit a connection or blacklist a connection)
+
+database.php: simple singleton class for database connection
+
+device_configuration.php: page to create or edit a device
+
+index.php: the login page
+
+main.css: style rules for the website front-end
+
+message.php: Sinterklaas message of a box
+
+query.php: query class with all queries used within the website
+
+util.php: some utilities used within the website.
+
+
+
+
+
